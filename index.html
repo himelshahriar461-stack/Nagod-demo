@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#d71935">
+<title>Nagad Demo</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#fce8e8;font-family:system-ui,"Noto Sans Bengali",sans-serif;color:#741021}
+.wrap{max-width:480px;margin:auto;padding:18px}.head{display:flex;align-items:center;gap:12px;margin:8px 0 18px}
+.logo{width:46px;height:46px;border-radius:13px;background:#e31e32;color:white;display:grid;place-items:center;font-size:27px;font-weight:800}
+h1{font-size:24px;margin:0;color:#a90019}.sub{font-size:11px;letter-spacing:1px;color:#a90019}
+.balance{background:#d71935;color:white;padding:22px;border-radius:20px;margin-bottom:16px}
+.balance small{opacity:.9}.amount{font-size:34px;font-weight:800;margin:5px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile, .panel{background:white;border:0;border-radius:16px;padding:17px;text-align:center;color:#941126;font-size:16px;font-weight:700}
+.tile span{display:block;font-size:27px;margin-bottom:6px}
+.panel{margin-top:14px;text-align:left;padding:18px}
+button{cursor:pointer}input{width:100%;padding:13px;border:1px solid #e7c4ca;border-radius:10px;margin:6px 0 13px;font-size:16px}
+.action{background:#d71935;color:white;border:0;border-radius:11px;padding:13px;width:100%;font-size:16px;font-weight:700}
+.back{background:white;color:#8f1227;border:1px solid #e7c4ca;margin-top:10px}
+.notice{font-size:12px;color:#a90019;text-align:center;margin:15px 0}
+.entry{display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:10px 0;gap:10px}
+.pos{color:#168044}.neg{color:#bd1830}
+</style></head>
+<body><main class="wrap">
+<div class="head"><div class="logo">ন</div><div><h1>নগদ</h1><div class="sub">DEMO WALLET</div></div></div>
+<section class="balance"><small>আপনার বর্তমান ডেমো ব্যালেন্স</small><div class="amount" id="balance">৳ 5,000</div><small>এটি আসল টাকা বা আসল নগদ ব্যালেন্স নয়</small></section>
+<section class="grid" id="menu">
+<button class="tile" onclick="show('send')"><span>📲</span>সেন্ড মানি</button>
+<button class="tile" onclick="show('cashin')"><span>💵</span>ক্যাশ ইন</button>
+<button class="tile" onclick="show('cashout')"><span>🏧</span>ক্যাশ আউট</button>
+<button class="tile" onclick="show('history')"><span>🧾</span>লেনদেন</button>
+</section>
+<section class="panel" id="screen"><b>স্বাগতম!</b><p>ডেমো সেবা ব্যবহার করতে উপরের একটি অপশন বেছে নিন।</p></section>
+<div class="notice">শুধুমাত্র শিক্ষামূলক ডেমো · বাস্তব লেনদেন সমর্থিত নয়</div>
+</main>
+<script>
+let balance=5000, history=[];
+const screen=document.getElementById('screen');
+function money(n){return '৳ '+n.toLocaleString('en-US')}
+function update(){document.getElementById('balance').textContent=money(balance)}
+function show(type){
+ if(type==='history'){screen.innerHTML='<b>লেনদেনের ইতিহাস</b>'+(history.length?history.map(x=>`<div class="entry"><span>${x.type}<br><small>${x.phone}</small></span><b class="${x.plus?'pos':'neg'}">${x.plus?'+':'−'}${money(x.amount)}</b></div>`).join(''):'<p>এখনো কোনো ডেমো লেনদেন নেই।</p>')+'<button class="action back" onclick="home()">হোমে ফিরুন</button>';return}
+ const title=type==='send'?'সেন্ড মানি':type==='cashin'?'ক্যাশ ইন':'ক্যাশ আউট';
+ screen.innerHTML=`<b>${title}</b><p><label>মোবাইল নম্বর</label><input id="phone" inputmode="numeric" placeholder="01XXXXXXXXX" maxlength="11"><label>টাকার পরিমাণ (৳)</label><input id="amt" type="number" min="1" placeholder="টাকার পরিমাণ লিখুন"><button class="action" onclick="transact('${type}')">কনফার্ম করুন</button><p id="msg"></p><button class="action back" onclick="home()">হোমে ফিরুন</button>`;
+}
+function transact(type){
+ const phone=document.getElementById('phone').value.trim(), amount=Number(document.getElementById('amt').value), msg=document.getElementById('msg');
+ if(!/^01[3-9]\d{8}$/.test(phone)){msg.textContent='সঠিক ১১ সংখ্যার বাংলাদেশি নম্বর দিন।';return}
+ if(!Number.isFinite(amount)||amount<=0){msg.textContent='সঠিক টাকার পরিমাণ দিন।';return}
+ if(type!=='cashin'&&amount>balance){msg.textContent='পর্যাপ্ত ডেমো ব্যালেন্স নেই।';return}
+ const plus=type==='cashin'; balance += plus?amount:-amount;
+ history.unshift({type:type==='send'?'সেন্ড মানি':plus?'ক্যাশ ইন':'ক্যাশ আউট',phone,amount,plus});
+ update(); msg.textContent='ডেমো লেনদেন সফল হয়েছে!';
+}
+function home(){screen.innerHTML='<b>স্বাগতম!</b><p>ডেমো সেবা ব্যবহার করতে উপরের একটি অপশন বেছে নিন।</p>'}
+</script></body></html>
